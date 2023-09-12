@@ -24,10 +24,6 @@ The following **extensions** are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-<img src='pro1 gif' title='Video Walkthrough' width='50%' alt='Video Walkthrough' />
-/Users/michele/Desktop/323 Lec notes/Project1_2/pro1 gif.gif
-
-
 https://github.com/m1chele11/Project2/assets/143828201/2b2538b4-62fe-43fb-bd38-26360a1b9d4b
 
 
