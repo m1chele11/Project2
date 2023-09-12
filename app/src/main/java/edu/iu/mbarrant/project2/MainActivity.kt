@@ -6,7 +6,11 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
+import kotlin.math.cos
+import kotlin.math.ln
+import kotlin.math.log10
 import kotlin.math.sin
+import kotlin.math.tan
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,17 +38,13 @@ class MainActivity : AppCompatActivity() {
         //the current result is 0.0 until a number is clicked and operator is executed
         var result = 0.0
         // this is used for the clear Button, since a clear will always display 0
-        var empty0 = "0"
+        val empty0 = "0"
 
+        //boolean to check if we use landscape specific buttons or not
+        val isPortrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
         //this is the text view
         val resultTV = findViewById<TextView>(R.id.resultTV)
-
-
-        val buttonIDsLand = arrayOf(
-            R.id.buttonSin, R.id.buttonCos,
-            R.id.buttonTan, R.id.buttonLog,
-            R.id.buttonLn)
 
         //an array of button ID's
         val buttonIds = arrayOf(
@@ -54,116 +54,279 @@ class MainActivity : AppCompatActivity() {
             R.id.buttonEquals, R.id.buttonClear, R.id.buttonPercent, R.id.buttonEquals, R.id.buttonTimes
         )
 
-    // For loop to loop through the array, that way we don't need multiple click Listeners
-    for (buttonId in buttonIds) {
-        /*
+        // Declare a variable to store the previous result
+        var prevResult = ""
+
+        if(isPortrait) {
+        // For loop to loop through the array, that way we don't need multiple click Listeners
+        for (buttonId in buttonIds) {
+            /*
         here the button selected becomes the button val, we check the button label
         first, that way we know what math to apply to the numbers clicked.
         since it is a string and we have the possibility of having a double we use .todouble()
         once an operator is selected the current number becomes empty again so that the user can select a new number to execut the operation
         we assign the result number to be displayed in the text view
          */
-        val button: Button = findViewById(buttonId)
-        button.setOnClickListener {
-            when (val buttonLabel = button.text) {
-                "+/-" -> {
-                    currentNumber = (currentNumber.toDouble() * -1).toString()
-                    resultTV.text = currentNumber
-                    Log.d("CalculatorActivity", "Button Clicked: neglect")
+            val button: Button = findViewById(buttonId)
+            button.setOnClickListener {
+                when (val buttonLabel = button.text) {
+                    "+/-" -> {
+                        currentNumber = (currentNumber.toDouble() * -1).toString()
+                        resultTV.text = currentNumber
+                        Log.d("CalculatorActivity", "Button Clicked: neglect")
+                    }
+                    "+", "-", "X", "/" -> {
+                        currentOperator = buttonLabel.toString()
+                        result = currentNumber.toDouble()
+                        currentNumber = ""
+                        //Log.d("CalculatorActivity", "Button Clicked: operator")
+                        if (setOf("+", "-", "X", "/").contains(buttonLabel)) {
+                            // Log the clicked operator
+                            Log.d("CalculatorActivity", "Button Clicked: Operator $buttonLabel")
+                        }
+
+                    }
+                    "%" -> {
+                        if (currentNumber.isNotEmpty()) {
+                            // Calculate the percentage
+                            result = currentNumber.toDouble() / 100
+                            currentNumber = result.toString()
+                            resultTV.text = currentNumber
+                            currentOperator = ""
+
+                            // Logging for the "%" button click
+                            Log.d("CalculatorActivity", "Button Clicked: Percent")
+                        }
+                    }
+                    //check what math to apply by button label
+                    "=" -> {
+                        if (currentOperator.isEmpty() && prevResult.isNotEmpty()){
+                            when (currentOperator) {
+                                "+" -> result += currentNumber.toDouble()
+                                "-" -> result -= currentNumber.toDouble()
+                                "X" -> result *= currentNumber.toDouble()
+                                "/" -> result /= currentNumber.toDouble()
+                                "%" -> result = currentNumber.toDouble() / 100
+                            }
+                            currentNumber = result.toString()
+                            resultTV.text = currentNumber
+                            currentOperator = ""
+                            prevResult = currentNumber
+                            //currentNumber = ""
+
+                            // Logging for the "=" button click
+                            Log.d("CalculatorActivity", "Button Clicked: Equals")
+                        }
+                        if (currentOperator.isNotEmpty() && currentNumber.isNotEmpty()) {
+                            when (currentOperator) {
+                                "+" -> result += currentNumber.toDouble()
+                                "-" -> result -= currentNumber.toDouble()
+                                "X" -> result *= currentNumber.toDouble()
+                                "/" -> result /= currentNumber.toDouble()
+                                "%" -> result = currentNumber.toDouble() / 100
+                            }
+                            currentNumber = result.toString()
+                            resultTV.text = currentNumber
+                            currentOperator = ""
+                            prevResult = currentNumber
+                            //currentNumber = ""
+
+                            // Logging for the "=" button click
+                            Log.d("CalculatorActivity", "Button Clicked: Equals")
+                        }
+                    }
+                    //clear
+                    "C" -> {
+                        currentNumber = empty0
+                        resultTV.text = currentNumber
+                        currentNumber = ""
+                        Log.d("CalculatorActivity", "Button Clicked: Clear")
+                    }
+                    //assign to TV
+                    else -> {
+                        if (buttonLabel == ".") {
+                            // Check if the button label is a decimal point
+                            // Ensure there's only one decimal point in the currentNumber
+                            if (!currentNumber.contains(".")) {
+                                currentNumber += buttonLabel
+                            }
+                        } else {
+                            currentNumber += buttonLabel
+                        }
+                        resultTV.text = currentNumber
+                        // Log the clicked number
+                        Log.d("CalculatorActivity", "Button Clicked: Number $buttonLabel")
+                    }
                 }
-                "sin" -> {
-                    try {
+            }
+        }
+
+    }//if phone is in landscape:
+    else {
+            //an array of button ID's
+            val buttonIDsLand = arrayOf(
+                R.id.buttonSin, R.id.buttonCos,
+                R.id.buttonTan, R.id.buttonLog,
+                R.id.buttonLn, R.id.button0, R.id.button1, R.id.button2, R.id.button3, R.id.button4,
+                R.id.button5, R.id.button6, R.id.button7, R.id.button8, R.id.button9,
+                R.id.buttonPlus, R.id.buttonMinus, R.id.buttonNegate, R.id.buttonDivide, R.id.buttonDecimal,
+                R.id.buttonEquals, R.id.buttonClear, R.id.buttonPercent, R.id.buttonEquals, R.id.buttonTimes)
+
+        for (buttonId in buttonIDsLand) {
+            /*
+        here the button selected becomes the button val, we check the button label
+        first, that way we know what math to apply to the numbers clicked.
+        since it is a string and we have the possibility of having a double we use .todouble()
+        once an operator is selected the current number becomes empty again so that the user can select a new number to execut the operation
+        we assign the result number to be displayed in the text view
+         */
+            val button: Button = findViewById(buttonId)
+            button.setOnClickListener {
+                when (val buttonLabel = button.text) {
+                    "+/-" -> {
+                        currentNumber = (currentNumber.toDouble() * -1).toString()
+                        resultTV.text = currentNumber
+                        Log.d("CalculatorActivity", "Button Clicked: neglect")
+                    }
+
+                    "sin" -> {
                         // Calculate the sine value (in radians) and display it
                         val radians = currentNumber.toDouble()
                         val result = sin(radians)
                         currentNumber = result.toString()
                         resultTV.text = currentNumber
                         currentOperator = ""
-
                         // Logging for the "Sin" button click
-                        Log.d("CalculatorActivity", "Button Clicked: Sin")
-                    } catch (e: NumberFormatException) {
-                        // Handle invalid input (non-numeric input)
+                        Log.d("CalculatorActivity", "Button Clicked: sin")
+                    }
+                    "cos" -> {
+                        val radians = currentNumber.toDouble()
+                        val result = cos(radians)
+                        currentNumber = result.toString()
+                        resultTV.text = currentNumber
+                        currentOperator = ""
+                        // Logging for the "cos" button click
+                        Log.d("CalculatorActivity", "Button Clicked: cos")
+                    }
+                    "tan" -> {
+                        val radians = currentNumber.toDouble()
+                        val result = tan(radians)
+                        currentNumber = result.toString()
+                        resultTV.text = currentNumber
+                        currentOperator = ""
+                        // Logging for the "tan" button click
+                        Log.d("CalculatorActivity", "Button Clicked: tan")
+
+                    }
+                    "log" -> {
+                        val temp = currentNumber.toDouble()
+                        val result = log10(temp)
+                        currentNumber = result.toString()
+                        resultTV.text = currentNumber
+                        currentOperator = ""
+                        // Logging for the "log" button click
+                        Log.d("CalculatorActivity", "Button Clicked: log")
+                    }
+                    "Ln" -> {
+                        val temp = currentNumber.toDouble()
+                        val result = ln(temp)
+                        currentNumber = result.toString()
+                        resultTV.text = currentNumber
+                        currentOperator = ""
+                        // Logging for the "ln" button click
+                        Log.d("CalculatorActivity", "Button Clicked: Ln")
+
+                    }
+                    "+", "-", "X", "/" -> {
+                        currentOperator = buttonLabel.toString()
+                        result = currentNumber.toDouble()
                         currentNumber = ""
-                        resultTV.text = "Error"
-                        Log.e("CalculatorActivity", "Error: Invalid input for Sin")
-                    }
-                }
-
-                "+", "-", "X", "/" -> {
-                    currentOperator = buttonLabel.toString()
-                    result = currentNumber.toDouble()
-                    currentNumber = ""
-                    //Log.d("CalculatorActivity", "Button Clicked: operator")
-                    if (setOf("+", "-", "X", "/").contains(buttonLabel)) {
-                        // Log the clicked operator
-                        Log.d("CalculatorActivity", "Button Clicked: Operator $buttonLabel")
-                    }
-
-                }
-                "%" -> {
-                    if (currentNumber.isNotEmpty()) {
-                        // Calculate the percentage
-                        result = currentNumber.toDouble() / 100
-                        currentNumber = result.toString()
-                        resultTV.text = currentNumber
-                        currentOperator = ""
-
-                        // Logging for the "%" button click
-                        Log.d("CalculatorActivity", "Button Clicked: Percent")
-                    }
-                }
-                //check what math to apply by button label
-                "=" -> {
-                    if (currentOperator.isNotEmpty() && currentNumber.isNotEmpty()) {
-                        when (currentOperator) {
-                            "+" -> result += currentNumber.toDouble()
-                            "-" -> result -= currentNumber.toDouble()
-                            "X" -> result *= currentNumber.toDouble()
-                            "/" -> result /= currentNumber.toDouble()
-                            "%" -> result = currentNumber.toDouble() / 100
+                        //Log.d("CalculatorActivity", "Button Clicked: operator")
+                        if (setOf("+", "-", "X", "/").contains(buttonLabel)) {
+                            // Log the clicked operator
+                            Log.d("CalculatorActivity", "Button Clicked: Operator $buttonLabel")
                         }
-                        currentNumber = result.toString()
-                        resultTV.text = currentNumber
-                        currentOperator = ""
-                        //currentNumber = ""
 
-                        // Logging for the "=" button click
-                        Log.d("CalculatorActivity", "Button Clicked: Equals")
                     }
-                }
-                //clear
-                "C" -> {
-                    currentNumber = empty0
-                    resultTV.text = currentNumber
-                    currentNumber =""
-                    Log.d("CalculatorActivity", "Button Clicked: Clear")
+                    "%" -> {
+                        if (currentNumber.isNotEmpty()) {
+                            // Calculate the percentage
+                            result = currentNumber.toDouble() / 100
+                            currentNumber = result.toString()
+                            resultTV.text = currentNumber
+                            currentOperator = ""
 
-                }
-                //assign to TV
-                else -> {
-                    // if (currentOperator.isEmpty()) {
-                    // If no operator has been selected, reset currentNumber
-                    //currentNumber = ""
-                    //}
+                            // Logging for the "%" button click
+                            Log.d("CalculatorActivity", "Button Clicked: Percent")
+                        }
+                    }
+                    //check what math to apply by button label
+                    "=" -> {
+                        if (currentOperator.isEmpty() && prevResult.isNotEmpty()){
+                            when (currentOperator) {
+                                "+" -> result += currentNumber.toDouble()
+                                "-" -> result -= currentNumber.toDouble()
+                                "X" -> result *= currentNumber.toDouble()
+                                "/" -> result /= currentNumber.toDouble()
+                                "%" -> result = currentNumber.toDouble() / 100
+                            }
+                            currentNumber = result.toString()
+                            resultTV.text = currentNumber
+                            currentOperator = ""
+                            prevResult = currentNumber
+                            //currentNumber = ""
 
-                    if (buttonLabel == ".") {
-                        // Check if the button label is a decimal point
-                        // Ensure there's only one decimal point in the currentNumber
-                        if (!currentNumber.contains(".")) {
+                            // Logging for the "=" button click
+                            Log.d("CalculatorActivity", "Button Clicked: Equals")
+                        }
+                        if (currentOperator.isNotEmpty() && currentNumber.isNotEmpty()) {
+                            when (currentOperator) {
+                                "+" -> result += currentNumber.toDouble()
+                                "-" -> result -= currentNumber.toDouble()
+                                "X" -> result *= currentNumber.toDouble()
+                                "/" -> result /= currentNumber.toDouble()
+                                "%" -> result = currentNumber.toDouble() / 100
+                            }
+                            currentNumber = result.toString()
+                            resultTV.text = currentNumber
+                            currentOperator = ""
+                            prevResult = currentNumber
+                            //currentNumber = ""
+
+                            // Logging for the "=" button click
+                            Log.d("CalculatorActivity", "Button Clicked: Equals")
+                        }
+                    }
+                    //clear
+                    "C" -> {
+                        currentNumber = empty0
+                        resultTV.text = currentNumber
+                        currentNumber = ""
+                        Log.d("CalculatorActivity", "Button Clicked: Clear")
+
+                    }
+                    //assign to TV
+                    else -> {
+                        // if (currentOperator.isEmpty()) {
+                        // If no operator has been selected, reset currentNumber
+                        //currentNumber = ""
+                        //}
+                        if (buttonLabel == ".") {
+                            // Check if the button label is a decimal point
+                            // Ensure there's only one decimal point in the currentNumber
+                            if (!currentNumber.contains(".")) {
+                                currentNumber += buttonLabel
+                            }
+                        } else {
                             currentNumber += buttonLabel
                         }
-                    } else {
-                        currentNumber += buttonLabel
+                        resultTV.text = currentNumber
+                        // Log the clicked number
+                        Log.d("CalculatorActivity", "Button Clicked: Number $buttonLabel")
                     }
-
-                    resultTV.text = currentNumber
-                    // Log the clicked number
-                    Log.d("CalculatorActivity", "Button Clicked: Number $buttonLabel")
                 }
             }
         }
-
     }
 
 

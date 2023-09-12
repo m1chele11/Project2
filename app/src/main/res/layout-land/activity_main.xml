@@ -245,21 +245,21 @@
         style="@style/buttonRow">
 
         <Button
-            android:layout_marginLeft="2.5dp"
-            android:layout_marginRight="2.5dp"
             android:id="@+id/button0"
             style="@style/buttonSymbol"
-            android:layout_width="204dp"
+            android:layout_width="207dp"
+            android:layout_marginLeft="2.5dp"
+            android:layout_marginRight="2.5dp"
             android:layout_weight="2"
             android:onClick="numAction"
             android:text="0"
             android:textColor="@color/white" />
 
         <Button
-            android:layout_marginLeft="2.5dp"
-            android:layout_marginRight="2.5dp"
             android:id="@+id/buttonDecimal"
             style="@style/buttonSymbol"
+            android:layout_marginLeft="2.5dp"
+            android:layout_marginRight="2.5dp"
             android:onClick="opAction"
             android:text="."
             android:textColor="@color/white"></Button>
