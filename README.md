@@ -24,7 +24,8 @@ The following **extensions** are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-https://github.com/m1chele11/Project2/assets/143828201/2b2538b4-62fe-43fb-bd38-26360a1b9d4b
+![Project2](https://github.com/m1chele11/Project2/assets/143828201/031cec42-ead8-427b-aec3-0cc5c0594401)
+
 
 
 
