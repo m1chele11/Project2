@@ -27,6 +27,8 @@ The following **extensions** are implemented:
 ## Video Walkthrough
 
 Here's a walkthrough of implemented user stories:
+![Project4](https://github.com/m1chele11/Project2/assets/143828201/667576dd-1137-413d-bce8-74a28eb55000)
+
 
 
 
